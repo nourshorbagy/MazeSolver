@@ -25,38 +25,32 @@ class SearchAlgorithms:
     path = []  # Represents the correct path from start node to the goal node.
     fullPath = []  # Represents all visited nodes from the start node to the goal node.
     totalCost = 0  # Represents the total cost in case using UCS, AStar (Euclidean or Manhattan)
-    maze = 0  # 2D array of nodes
-    limit = 0
-    state = []
-    visitedNodes = []
-    startNode = Node(0)  # could be id only pair
-    endNode = Node(0)
-    solved = 0
+    maze = []  # 2D array of nodes
+    limit = 10
+    startNode = 0  # could be id only pair
+    endNode = 0
 
     def __init__(self, mazeStr, heristicValue=None):
         self.path.clear()
         self.fullPath.clear()
         rows = mazeStr.split()
-        cols = rows[0].split(',')
-        self.maze = [[0] * len(cols)] * len(rows)
         self.maze = []
         i = 0
-        for x in rows:
-            hell = []
-            col = x.split(',')
+        for r in rows:
+            rowLine = []
+            cols = r.split(',')
             j = 0
-            for y in col:
-                node = Node(y)
+            for c in cols:
+                node = Node(c)
                 node.id = str(i) + "," + str(j)
-                hell.append(node)
-                if y == 'S':
+                rowLine.append(node)
+                if c == 'S':
                     self.startNode = node
-                elif y == 'E':
+                elif c == 'E':
                     self.endNode = node
                 j += 1
-            self.maze.append(hell.copy())
+            self.maze.append(rowLine.copy())
             i += 1
-        self.limit = 30
         #heuristic
         if(heristicValue != None):
             self.mapHeuristics(heristicValue)
@@ -105,22 +99,17 @@ class SearchAlgorithms:
 
     def MakeMove(self, Statenode, action):
         x = Statenode.id.split(",")
-        i = x[0]
-        j = x[1]
-        newi = int(i)
-        newj = int(j)
+        newi = int(x[0])
+        newj = int(x[1])
         if action == "up":
-            newi = int(i) - 1
+            newi -= 1
         elif action == "down":
-            newi = int(i) + 1
+            newi += 1
         elif action == "right":
-            newj = int(j) + 1
+            newj += 1
         else:
-            newj = int(j) - 1
-        '''for k in range(len(self.maze)):
-            for z in range(len(self.maze[k])):
-                if id == self.maze[k][z].id:
-                    return self.maze[k][z]'''
+            newj -= 1
+        
         return self.maze[newi][newj]
 
     def backtrack(self, node):
@@ -144,36 +133,28 @@ class SearchAlgorithms:
         return self.path[::-1], self.fullPath
 
     def recursive_dls(self, currentNode, limit):
+        self.fullPath.append(currentNode.id)
         if self.isGoal(currentNode):
-            self.backtrack(currentNode)
-            self.solved = 1
-            return self.path, self.fullPath  # backtrack function
+            self.path.append(self.endNode.id)
+            self.backtrack(currentNode)  # backtrack function
+            return self.path, self.fullPath
         if limit == 0:
-            return 1, self.fullPath  # cutoff
-        cutOffOccured = 0
+            return 1  # Cutoff
+        cutOffOccured = False
         actions = self.getChildren(currentNode)  # up down right left
-        foundSolution = False
         for action in actions:
             child = self.MakeMove(currentNode, action)
-            if self.solved == 0 and (currentNode.previousNode == None or child.id != currentNode.previousNode.id):
+            if child.id not in self.fullPath:
                 child.previousNode = currentNode
-                self.fullPath.append(child.id)
                 result = self.recursive_dls(child, limit - 1)
-                if result != 1 and result != 0:  # cutoff
-                    foundSolution = True
-            else:
-                result = 0
-            if result == 1:  # cutoff
-                cutOffOccured = 1
-        if foundSolution:
-            return self.path, self.fullPath
-        if cutOffOccured:
-            return 1, self.fullPath
-        if result != 0:  # fail
-            return result
-        else:
-            return 0, self.fullPath  # fail
-
+                if result == 1:  # Cutoff
+                    cutOffOccured = True
+                elif result != 0:
+                    return result
+        if cutOffOccured == True:  # Cutoff
+            return 1
+        return 0  # Failure
+    
     def BDS(self):
         # Fill the correct path in self.path
         # self.fullPath should contain the order of visited nodes
@@ -195,11 +176,10 @@ class SearchAlgorithms:
             if len(Qs) != 0:
                 nodeS = Qs.pop(0)
                 self.fullPath.append(nodeS.id)
-                if nodeS == nodeG or nodeS in Qe:
+                if nodeS == nodeG or nodeS in Qe:  # Success
                     self.backtrack(nodeS)
                     self.path.reverse()
                     self.backtrack(nodeG)
-                    
                     return self.path, self.fullPath
                 actions = self.getChildren(nodeS)
                 for action in actions:
@@ -212,7 +192,7 @@ class SearchAlgorithms:
             if len(Qe) != 0:
                 nodeG = Qe.pop(0)
                 self.fullPath.append(nodeG.id)
-                if nodeG == nodeS or nodeG in Qs:
+                if nodeG == nodeS or nodeG in Qs:  # Success
                     self.backtrack(nodeS)
                     self.path.reverse()
                     self.backtrack(nodeG)
