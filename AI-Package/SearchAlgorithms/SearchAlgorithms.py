@@ -9,7 +9,9 @@ class Node:
     gOfN = None  # Represents the total edge cost
     hOfN = 0  # Represents the heuristic value
     heuristicFn = None  # Represents the value of heuristic function
-    visted = False
+    vistede = False
+    visteds = False
+    nextNode = None
 
     def __init__(self, value):
         self.value = value
@@ -67,28 +69,6 @@ class SearchAlgorithms:
                 self.maze[i][j].hOfN = heristicValue[k]
                 k+=1
 
-    def test(self):
-        for i in range(5):
-            for j in range(7):
-                print(self.maze[i][j].id)
-            print()
-        print("TEST OUT")
-
-    def copy(self, node, newNode):
-        newNode.value = node.value
-        newNode.id = node.id
-        newNode.previousNode = node.previousNode
-        newNode.up = node.up
-        newNode.down = node.down
-        newNode.right = node.right
-        newNode.left = node.left
-        newNode.edgeCost = node.edgeCost
-        newNode.gOfN = node.gOfN
-        newNode.hOfN = node.hOfN
-        newNode.heuristicFn = node.heuristicFn
-
-        return
-
     def isGoal(self, node):
         x = node.id.split(",")
         i = int(x[0])
@@ -144,19 +124,17 @@ class SearchAlgorithms:
         return self.maze[newi][newj]
 
     def backtrack(self, node):
-        '''if node != None:
-            self.path.append(node.id)
-            self.backtrack(node.previousNode)
-           '''
-        self.path.append(self.endNode.id)
         self.path.append(node.id)
         self.totalCost += (self.endNode.hOfN + node.hOfN)
-        while node.previousNode != None:
-            node = node.previousNode
-            self.path.append(node.id)
-            self.totalCost += node.hOfN
-
-
+        temp = node
+        while temp.previousNode != None:
+            temp = temp.previousNode
+            self.path.append(temp.id)
+            self.totalCost += temp.hOfN
+        
+        while temp.nextNode != None:
+            temp = temp.nextNode
+            self.path.append(temp.id)
 
     def DLS(self):
         # Fill the correct path in self.path
@@ -196,7 +174,6 @@ class SearchAlgorithms:
         else:
             return 0, self.fullPath  # fail
 
-
     def BDS(self):
         # Fill the correct path in self.path
         # self.fullPath should contain the order of visited nodes
@@ -214,28 +191,37 @@ class SearchAlgorithms:
         nodeS = self.startNode
         nodeG = self.endNode
 
-        while (len(Qs) != 0 and len(Qe) != 0):
+        while(len(Qs) != 0 and len(Qe) != 0):
             if len(Qs) != 0:
                 nodeS = Qs.pop(0)
                 self.fullPath.append(nodeS.id)
                 if nodeS == nodeG or nodeS in Qe:
+                    self.backtrack(nodeS)
+                    self.path.reverse()
+                    self.backtrack(nodeG)
+                    
                     return self.path, self.fullPath
                 actions = self.getChildren(nodeS)
                 for action in actions:
                     child = self.MakeMove(nodeS, action)
                     if child.visteds == False:
+                        child.previousNode = nodeS
                         child.visteds = True
                         Qs.append(child)
-
+            
             if len(Qe) != 0:
                 nodeG = Qe.pop(0)
                 self.fullPath.append(nodeG.id)
                 if nodeG == nodeS or nodeG in Qs:
+                    self.backtrack(nodeS)
+                    self.path.reverse()
+                    self.backtrack(nodeG)
                     return self.path, self.fullPath
                 actions = self.getChildren(nodeG)
                 for action in actions:
                     child = self.MakeMove(nodeG, action)
                     if child.vistede == False:
+                        child.nextNode = nodeG
                         child.vistede = True
                         Qe.append(child)
 
@@ -255,6 +241,7 @@ class SearchAlgorithms:
             if self.isGoal(n):
                 self.fullPath.append(n.id)
                 self.fullPath.append(self.endNode.id)
+                self.path.append(self.endNode.id)
                 self.backtrack(n)
                 return self.path[::-1] , self.fullPath , self.totalCost
             actions = self.getChildren(n)
@@ -275,9 +262,9 @@ def main():
 
     #######################################################################################
 
-    #searchAlgo = SearchAlgorithms('S,.,.,#,.,.,. .,#,.,.,.,#,. .,#,.,.,.,.,. .,.,#,#,.,.,. #,.,#,E,.,#,.')
-    #path, fullPath = searchAlgo.BDS()
-    #print('**BFS**\nPath is: ' + str(path) + '\nFull Path is: ' + str(fullPath) + '\n\n')
+    searchAlgo = SearchAlgorithms('S,.,.,#,.,.,. .,#,.,.,.,#,. .,#,.,.,.,.,. .,.,#,#,.,.,. #,.,#,E,.,#,.')
+    path, fullPath = searchAlgo.BDS()
+    print('**BFS**\nPath is: ' + str(path) + '\nFull Path is: ' + str(fullPath) + '\n\n')
     #######################################################################################
 
     searchAlgo = SearchAlgorithms('S,.,.,#,.,.,. .,#,.,.,.,#,. .,#,.,.,.,.,. .,.,#,#,.,.,. #,.,#,E,.,#,.',
