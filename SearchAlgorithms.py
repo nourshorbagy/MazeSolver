@@ -200,7 +200,7 @@ class SearchAlgorithms:
     def BDS(self):
         # Fill the correct path in self.path
         # self.fullPath should contain the order of visited nodes
-        return 0, closedlist  # Failure
+        return 0  # Failure
 
     def helpSort(self, node):
         return node.hOfN
