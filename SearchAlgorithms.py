@@ -200,6 +200,45 @@ class SearchAlgorithms:
     def BDS(self):
         # Fill the correct path in self.path
         # self.fullPath should contain the order of visited nodes
+        self.path.clear()
+        self.fullPath.clear()
+        Qs = []
+        Qe = []
+
+        Qs.append(self.startNode)
+        Qe.append(self.endNode)
+
+        self.startNode.visteds = True
+        self.endNode.vistede = True
+
+        nodeS = self.startNode
+        nodeG = self.endNode
+
+        while (len(Qs) != 0 and len(Qe) != 0):
+            if len(Qs) != 0:
+                nodeS = Qs.pop(0)
+                self.fullPath.append(nodeS.id)
+                if nodeS == nodeG or nodeS in Qe:
+                    return self.path, self.fullPath
+                actions = self.getChildren(nodeS)
+                for action in actions:
+                    child = self.MakeMove(nodeS, action)
+                    if child.visteds == False:
+                        child.visteds = True
+                        Qs.append(child)
+
+            if len(Qe) != 0:
+                nodeG = Qe.pop(0)
+                self.fullPath.append(nodeG.id)
+                if nodeG == nodeS or nodeG in Qs:
+                    return self.path, self.fullPath
+                actions = self.getChildren(nodeG)
+                for action in actions:
+                    child = self.MakeMove(nodeG, action)
+                    if child.vistede == False:
+                        child.vistede = True
+                        Qe.append(child)
+
         return 0  # Failure
 
     def helpSort(self, node):
