@@ -54,7 +54,7 @@ class SearchAlgorithms:
                 j += 1
             self.maze.append(hell.copy())
             i += 1
-        self.limit = 10
+        self.limit = 30
         #heuristic
         if(heristicValue != None):
             self.mapHeuristics(heristicValue)
