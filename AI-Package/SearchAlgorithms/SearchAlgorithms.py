@@ -128,7 +128,6 @@ class SearchAlgorithms:
     def DLS(self):
         # Fill the correct path in self.path
         # self.fullPath should contain the order of visited nodes
-        self.fullPath.append(self.startNode.id)
         self.recursive_dls(self.startNode, self.limit)
         return self.path[::-1], self.fullPath
 
