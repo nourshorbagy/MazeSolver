@@ -120,7 +120,9 @@ class SearchAlgorithms:
             temp = temp.previousNode
             self.path.append(temp.id)
             self.totalCost += temp.hOfN
-        
+    
+    def backtracknext(self, node):
+        temp = node
         while temp.nextNode != None:
             temp = temp.nextNode
             self.path.append(temp.id)
@@ -178,7 +180,7 @@ class SearchAlgorithms:
                 if nodeS == nodeG or nodeS in Qe:  # Success
                     self.backtrack(nodeS)
                     self.path.reverse()
-                    self.backtrack(nodeG)
+                    self.backtracknext(nodeS)
                     return self.path, self.fullPath
                 actions = self.getChildren(nodeS)
                 for action in actions:
@@ -194,7 +196,7 @@ class SearchAlgorithms:
                 if nodeG == nodeS or nodeG in Qs:  # Success
                     self.backtrack(nodeS)
                     self.path.reverse()
-                    self.backtrack(nodeG)
+                    self.backtracknext(nodeS)
                     return self.path, self.fullPath
                 actions = self.getChildren(nodeG)
                 for action in actions:
