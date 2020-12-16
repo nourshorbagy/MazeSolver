@@ -180,7 +180,7 @@ class SearchAlgorithms:
                 if nodeS == nodeG or nodeS in Qe:  # Success
                     self.backtrack(nodeS)
                     self.path.reverse()
-                    self.backtracknext(nodeS)
+                    self.backtrack(nodeS)
                     return self.path, self.fullPath
                 actions = self.getChildren(nodeS)
                 for action in actions:
@@ -194,15 +194,15 @@ class SearchAlgorithms:
                 nodeG = Qe.pop(0)
                 self.fullPath.append(nodeG.id)
                 if nodeG == nodeS or nodeG in Qs:  # Success
-                    self.backtrack(nodeS)
+                    self.backtrack(nodeG)
                     self.path.reverse()
-                    self.backtracknext(nodeS)
+                    self.backtracknext(nodeG)
                     return self.path, self.fullPath
                 actions = self.getChildren(nodeG)
                 for action in actions:
                     child = self.MakeMove(nodeG, action)
                     if child.vistede == False:
-                        child.nextNode = nodeG
+                        child.previousNode = nodeG
                         child.vistede = True
                         Qe.append(child)
 
