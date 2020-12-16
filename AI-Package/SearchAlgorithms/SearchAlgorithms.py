@@ -26,7 +26,7 @@ class SearchAlgorithms:
     fullPath = []  # Represents all visited nodes from the start node to the goal node.
     totalCost = 0  # Represents the total cost in case using UCS, AStar (Euclidean or Manhattan)
     maze = []  # 2D array of nodes
-    limit = 10
+    limit = 50
     startNode = 0  # could be id only pair
     endNode = 0
 
@@ -88,12 +88,12 @@ class SearchAlgorithms:
         if (i + 1) < len(self.maze) and (self.maze[i + 1][j].value == '.'):
             node.down = 1
             children.append("down")
-        if (j + 1) < len(self.maze[0]) and (self.maze[i][j + 1].value == '.'):
-            node.right = 1
-            children.append("right")
         if (j - 1) >= 0 and (self.maze[i][j - 1].value == '.'):
             node.left = 1
             children.append("left")
+        if (j + 1) < len(self.maze[0]) and (self.maze[i][j + 1].value == '.'):
+            node.right = 1
+            children.append("right")
 
         return children
 
